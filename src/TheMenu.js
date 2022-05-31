@@ -1,8 +1,9 @@
 import { Component } from "react";
-import { Menu, Segment } from "semantic-ui-react";
+import { Button, Divider, Grid, Menu, Segment } from "semantic-ui-react";
+import FormSongSelect from "./FormSongSelect";
 
-export default class MenuExampleSecondaryPointing extends Component {
-  state = { activeItem: "home" };
+export default class TheMenu extends Component {
+  state = { activeItem: "frequency" };
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name });
 
@@ -11,36 +12,56 @@ export default class MenuExampleSecondaryPointing extends Component {
 
     return (
       <div>
-        <Menu pointing secondary>
+        <Menu tabular>
           <Menu.Item
-            name="词频"
+            name="frequency"
             active={activeItem === "frequency"}
             onClick={this.handleItemClick}
           />
           <Menu.Item
-            name="词云"
+            name="wordcloud"
             active={activeItem === "wordcloud"}
             onClick={this.handleItemClick}
           />
           <Menu.Item
-            name="主题流"
+            name="stream"
             active={activeItem === "stream"}
             onClick={this.handleItemClick}
           />
           <Menu.Item
-            name="聚类"
+            name="cluster"
             active={activeItem === "cluster"}
             onClick={this.handleItemClick}
           />
           <Menu.Item
-            name="情感分析"
+            name="emotion"
             active={activeItem === "emotion"}
             onClick={this.handleItemClick}
           />
         </Menu>
 
-        <Segment>
-          <img src="https://react.semantic-ui.com/images/wireframe/media-paragraph.png" />
+        <Segment relaxed>
+          {activeItem === "cluster" ? (
+            <Button primary>Show</Button>
+          ) : (
+            <>
+              <Grid columns={2} relaxed="very" stackable>
+                <Grid.Column>
+                  <FormSongSelect
+                    hideSong={activeItem === "stream"}
+                    tree={this.props.tree}
+                  />
+                </Grid.Column>
+                <Grid.Column>
+                  <FormSongSelect
+                    hideSong={activeItem === "stream"}
+                    tree={this.props.tree}
+                  />
+                </Grid.Column>
+              </Grid>
+              <Divider vertical>vs</Divider>
+            </>
+          )}
         </Segment>
       </div>
     );

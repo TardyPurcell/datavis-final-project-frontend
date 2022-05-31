@@ -1,27 +1,29 @@
 import TheHeader from "./TheHeader";
-import TheForm from "./TheForm";
 import TheChart from "./TheChart";
-import TheTab from "./TheMenu";
+import TheMenu from "./TheMenu";
+import TheUpload from "./TheUpload";
+import { Divider } from "semantic-ui-react";
+import { Component } from "react";
 
-const artistOptions = [];
-
-const albumOptions = [];
-
-const songOptions = [];
-
-function App() {
-  return (
-    <div className="App">
-      <TheHeader />
-      <TheTab />
-      <TheForm
-        artistOptions={artistOptions}
-        albumOptions={albumOptions}
-        songOptions={songOptions}
-      />
-      <TheChart />
-    </div>
-  );
+export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { tree: null };
+  }
+  render() {
+    return (
+      <div className="App">
+        <TheHeader />
+        <Divider hidden />
+        <TheUpload
+          handleFileLoad={(tree) => {
+            this.setState({ tree });
+          }}
+        />
+        <Divider hidden />
+        <TheMenu tree={this.state.tree} />
+        <TheChart />
+      </div>
+    );
+  }
 }
-
-export default App;
