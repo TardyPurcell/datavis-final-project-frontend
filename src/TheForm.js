@@ -1,7 +1,7 @@
 import { Component } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
 
-class TheForm extends Component {
+export default class TheForm extends Component {
   state = { artists: [], albums: [], songs: [] };
 
   render() {
@@ -61,5 +61,3 @@ class TheForm extends Component {
     );
   }
 }
-
-export default TheForm;
