@@ -20,19 +20,8 @@ export default class App extends Component {
   }
   getData = async (sel, type) => {
     let data;
-    let args = sel.who
-      ? "who=" +
-        sel.who +
-        (sel.artist
-          ? "&artist=" +
-            sel.artist +
-            (sel.album
-              ? "&album=" + sel.album + (sel.song ? "&song=" + sel.song : "")
-              : "")
-          : "")
-      : "";
     if (type === "frequency") {
-      let res = await axios.get(`${API_URL}/frequency?${args}`);
+      let res = await axios.get(`${API_URL}/frequency`, { params: sel });
       data = {
         legendData: res.data.cnt.map((entry) => entry.word),
         seriesData: res.data.cnt.map((entry) => ({
