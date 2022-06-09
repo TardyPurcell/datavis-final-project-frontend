@@ -6,7 +6,7 @@ import { Divider } from "semantic-ui-react";
 import { Component } from "react";
 import axios from "axios";
 import { API_URL } from "./utils/url";
-import pieOps from "./utils/chartops";
+import { pieOps, wordcloudOps, treeOps } from "./utils/chartops";
 
 export default class App extends Component {
   constructor(props) {
@@ -31,14 +31,20 @@ export default class App extends Component {
       };
       data = pieOps(data);
     } else if (type === "wordcloud") {
+      let res = await axios.get(`${API_URL}/frequency`, { params: sel });
+      data = res.data.cnt.map((entry) => ({
+        name: entry.word,
+        value: entry.count,
+      }));
+      data = wordcloudOps(data);
     } else if (type === "stream") {
     } else if (type === "emotion") {
     } else {
     }
     return data;
   };
-  clearChart = () => {
-    this.setState({ chart1: null, chart2: null });
+  clearChart = (cluster) => {
+    this.setState({ chart1: null, chart2: null, cluster });
   };
   handleSubmit = async (sel, id, type, callback) => {
     try {
@@ -78,9 +84,24 @@ export default class App extends Component {
         <TheMenu
           tree={this.state.tree}
           handleSubmit={this.handleSubmit}
+          handleCluster={async (k, callback) => {
+            try {
+              let resp = await axios.get(`${API_URL}/kMeans`, {
+                params: { k },
+              });
+              let chart1 = treeOps(resp.data);
+              this.setState({ chart1 });
+            } finally {
+              callback();
+            }
+          }}
           clearChart={this.clearChart}
         />
-        <TheChart chart1={this.state.chart1} chart2={this.state.chart2} />
+        <TheChart
+          chart1={this.state.chart1}
+          chart2={this.state.chart2}
+          cluster={this.state.cluster}
+        />
       </div>
     );
   }

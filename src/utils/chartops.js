@@ -1,4 +1,4 @@
-const pieOps = (data) => ({
+export const pieOps = (data) => ({
   tooltip: {
     trigger: "item",
     formatter: "{a} <br/>{b} : {c} ({d}%)",
@@ -43,4 +43,61 @@ const pieOps = (data) => ({
   ],
 });
 
-export default pieOps;
+export const wordcloudOps = (data) => ({
+  series: [
+    {
+      type: "wordCloud",
+      shape: "circle",
+      rotationStep: 10,
+      textStyle: {
+        fontFamily: "sans-serif",
+        fontWeight: "bold",
+        // Color can be a callback function or a color string
+        color: function () {
+          // Random color
+          return (
+            "rgb(" +
+            [
+              Math.round(Math.random() * 160),
+              Math.round(Math.random() * 160),
+              Math.round(Math.random() * 160),
+            ].join(",") +
+            ")"
+          );
+        },
+      },
+      emphasis: {
+        focus: "self",
+
+        textStyle: {
+          shadowBlur: 10,
+          shadowColor: "#333",
+        },
+      },
+      data,
+    },
+  ],
+});
+
+export const treeOps = (data) => ({
+  tooltip: {
+    trigger: "item",
+    triggerOn: "mousemove",
+  },
+  series: [
+    {
+      type: "tree",
+      data: [data],
+      top: "18%",
+      bottom: "14%",
+      layout: "radial",
+      symbol: "emptyCircle",
+      symbolSize: 7,
+      initialTreeDepth: 3,
+      animationDurationUpdate: 750,
+      emphasis: {
+        focus: "descendant",
+      },
+    },
+  ],
+});

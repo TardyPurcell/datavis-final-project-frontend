@@ -3,11 +3,11 @@ import { Button, Divider, Grid, Input, Menu, Segment } from "semantic-ui-react";
 import FormSongSelect from "./FormSongSelect";
 
 export default class TheMenu extends Component {
-  state = { activeItem: "frequency" };
+  state = { activeItem: "frequency", k: 3 };
 
   handleItemClick = (e, { name }) => {
     this.setState({ activeItem: name });
-    this.props.clearChart();
+    this.props.clearChart(name === "cluster");
   };
 
   render() {
@@ -53,12 +53,29 @@ export default class TheMenu extends Component {
             <Grid columns={1}>
               <Grid.Row>
                 <Grid.Column>
-                  <Input type="number" label="Number of clusters" />
+                  <Input
+                    type="number"
+                    label="Number of clusters"
+                    defaultValue={3}
+                    onChange={(e) => {
+                      this.setState({ k: e.target.value });
+                    }}
+                  />
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
                 <Grid.Column>
-                  <Button primary>Show</Button>
+                  <Button
+                    primary
+                    disabled={!this.state.k || this.state.loading}
+                    loading={this.state.loading}
+                    onClick={() => {
+                      this.setState({ loading: true });
+                      this.props.handleCluster(this.state.k, () => this.setState({ loading: false }));
+                    }}
+                  >
+                    Show
+                  </Button>
                 </Grid.Column>
               </Grid.Row>
             </Grid>

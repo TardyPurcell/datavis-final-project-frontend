@@ -31,6 +31,7 @@ export default class FormSongSelect extends Component {
               fluid
               search
               selection
+              clearable={!this.state.artist}
               options={this.state.userOptions}
               onChange={(e, data) => {
                 this.setState({
@@ -38,14 +39,23 @@ export default class FormSongSelect extends Component {
                   artist: null,
                   album: null,
                   song: null,
-                  artistOptions: Object.keys(this.props.tree[data.value]).map(
-                    (artist) => ({
-                      key: artist,
-                      value: artist,
-                      text: artist,
-                    })
-                  ),
                 });
+                if (data.value) {
+                  this.setState({
+                    artistOptions: Object.keys(this.props.tree[data.value]).map(
+                      (artist) => ({
+                        key: artist,
+                        value: artist,
+                        text: artist,
+                      })
+                    ),
+                  });
+                } else {
+                  this.setState({
+                    who: null,
+                    artistOptions: [],
+                  });
+                }
               }}
             />
           </Form.Field>
@@ -56,20 +66,30 @@ export default class FormSongSelect extends Component {
               fluid
               search
               selection
+              clearable={!this.state.album}
               options={this.state.artistOptions}
               onChange={(e, data) => {
                 this.setState({
                   artist: data.value,
                   album: null,
                   song: null,
-                  albumOptions: Object.keys(
-                    this.props.tree[this.state.who][data.value]
-                  ).map((album) => ({
-                    key: album,
-                    value: album,
-                    text: album,
-                  })),
                 });
+                if (data.value) {
+                  this.setState({
+                    albumOptions: Object.keys(
+                      this.props.tree[this.state.who][data.value]
+                    ).map((album) => ({
+                      key: album,
+                      value: album,
+                      text: album,
+                    })),
+                  });
+                } else {
+                  this.setState({
+                    artist: null,
+                    albumOptions: [],
+                  });
+                }
               }}
             />
           </Form.Field>
@@ -80,21 +100,31 @@ export default class FormSongSelect extends Component {
               fluid
               search
               selection
+              clearable={!this.state.song}
               options={this.state.albumOptions}
               onChange={(e, data) => {
                 this.setState({
                   album: data.value,
                   song: null,
-                  songOptions: Object.keys(
-                    this.props.tree[this.state.who][this.state.artist][
-                      data.value
-                    ]
-                  ).map((song) => ({
-                    key: song,
-                    value: song,
-                    text: song,
-                  })),
                 });
+                if (data.value) {
+                  this.setState({
+                    songOptions: Object.keys(
+                      this.props.tree[this.state.who][this.state.artist][
+                        data.value
+                      ]
+                    ).map((song) => ({
+                      key: song,
+                      value: song,
+                      text: song,
+                    })),
+                  });
+                } else {
+                  this.setState({
+                    album: null,
+                    songOptions: [],
+                  });
+                }
               }}
             />
           </Form.Field>
@@ -105,9 +135,12 @@ export default class FormSongSelect extends Component {
               fluid
               search
               selection
+              clearable
               options={this.state.songOptions}
               onChange={(e, data) => {
-                this.setState({ song: data.value });
+                data.value
+                  ? this.setState({ song: data.value })
+                  : this.setState({ song: null });
               }}
             />
           </Form.Field>
