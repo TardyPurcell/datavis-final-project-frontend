@@ -38,7 +38,9 @@ export default class TheMenu extends Component {
             name="stream"
             active={activeItem === "stream"}
             onClick={this.handleItemClick}
-          />
+          >
+            Theme River
+          </Menu.Item>
           <Menu.Item
             name="cluster"
             active={activeItem === "cluster"}
