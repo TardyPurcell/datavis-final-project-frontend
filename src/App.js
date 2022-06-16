@@ -6,7 +6,14 @@ import { Divider } from "semantic-ui-react";
 import { Component } from "react";
 import axios from "axios";
 import { API_URL } from "./utils/url";
-import { pieOps, wordcloudOps, treeOps } from "./utils/chartops";
+import {
+  pieOps,
+  wordcloudOps,
+  treeOps,
+  streamOps,
+  mapOps,
+  radarOps,
+} from "./utils/chartops";
 
 export default class App extends Component {
   constructor(props) {
@@ -18,6 +25,7 @@ export default class App extends Component {
       error: null,
     };
   }
+
   getData = async (sel, type) => {
     let data;
     if (type === "frequency") {
@@ -38,14 +46,39 @@ export default class App extends Component {
       }));
       data = wordcloudOps(data);
     } else if (type === "stream") {
+      let reqList = [];
+      let idxList = [];
+      for (let song of Object.keys(
+        this.state.tree[sel.who][sel.artist][sel.album]
+      )) {
+        sel.song = song;
+        idxList.push(this.state.tree[sel.who][sel.artist][sel.album][song]);
+        reqList.push(axios.get(`${API_URL}/emo`, { params: sel }));
+      }
+      let resList = await axios.all(reqList);
+      data = [];
+      resList.forEach((res, i) =>
+        data.push.apply(data, [
+          [idxList[i], res.data.emo5.Angry, "Angry"],
+          [idxList[i], res.data.emo5.Fear, "Fear"],
+          [idxList[i], res.data.emo5.Happy, "Happy"],
+          [idxList[i], res.data.emo5.Sad, "Sad"],
+          [idxList[i], res.data.emo5.Surprise, "Surprise"],
+        ])
+      );
+      data = streamOps(data);
     } else if (type === "emotion") {
-    } else {
+      let res = await axios.get(`${API_URL}/emo`, { params: sel });
+      data = Object.values(res.data.emo5);
+      data = radarOps(data);
     }
     return data;
   };
+
   clearChart = (cluster) => {
     this.setState({ chart1: null, chart2: null, cluster });
   };
+
   handleSubmit = async (sel, id, type, callback) => {
     try {
       if (id === "chart1") {
@@ -59,6 +92,7 @@ export default class App extends Component {
       callback();
     }
   };
+
   render() {
     if (this.state.tree === null) {
       if (this.state.error) return this.state.error;
@@ -84,13 +118,27 @@ export default class App extends Component {
         <TheMenu
           tree={this.state.tree}
           handleSubmit={this.handleSubmit}
-          handleCluster={async (k, callback) => {
+          handleCluster={async (k, activeItem, callback) => {
             try {
-              let resp = await axios.get(`${API_URL}/kMeans`, {
-                params: { k },
-              });
-              let chart1 = treeOps(resp.data);
-              this.setState({ chart1 });
+              if (activeItem === "cluster") {
+                let resp = await axios.get(`${API_URL}/kMeans`, {
+                  params: { k },
+                });
+                let chart1 = treeOps(resp.data);
+                this.setState({ chart1 });
+              } else {
+                // if (!Number.isInteger(k)) {
+                //   return "k must be an integer";
+                // }
+                if (k < 1) {
+                  return "k must be greater than 0";
+                }
+                let resp = await axios.get(`${API_URL}/fmap`);
+                let chart1 = mapOps(resp.data.data, k);
+                this.setState({ chart1 });
+              }
+            } catch (err) {
+              return err.response.data;
             } finally {
               callback();
             }

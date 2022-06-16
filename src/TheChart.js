@@ -6,21 +6,43 @@ import {
   TitleComponent,
   TooltipComponent,
   LegendComponent,
+  SingleAxisComponent,
+  DatasetComponent,
+  GridComponent,
+  VisualMapComponent,
+  TransformComponent,
 } from "echarts/components";
-import { PieChart, TreeChart } from "echarts/charts";
-import { LabelLayout } from "echarts/features";
+import {
+  PieChart,
+  TreeChart,
+  ThemeRiverChart,
+  ScatterChart,
+  RadarChart,
+} from "echarts/charts";
+import { LabelLayout, UniversalTransition } from "echarts/features";
 import { CanvasRenderer } from "echarts/renderers";
 import "echarts-wordcloud";
+import ecStat from "echarts-stat";
 
 echarts.use([
+  SingleAxisComponent,
   TitleComponent,
   TooltipComponent,
   LegendComponent,
   PieChart,
   TreeChart,
+  ThemeRiverChart,
   CanvasRenderer,
   LabelLayout,
+  DatasetComponent,
+  GridComponent,
+  VisualMapComponent,
+  TransformComponent,
+  ScatterChart,
+  RadarChart,
 ]);
+
+echarts.registerTransform(ecStat.transform.clustering);
 
 export default class TheChart extends Component {
   render() {

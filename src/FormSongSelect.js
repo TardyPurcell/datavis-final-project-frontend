@@ -9,11 +9,6 @@ export default class FormSongSelect extends Component {
       artist: null,
       album: null,
       song: null,
-      userOptions: Object.keys(this.props.tree).map((user) => ({
-        key: user,
-        value: user,
-        text: user,
-      })),
       artistOptions: [],
       albumOptions: [],
       songOptions: [],
@@ -32,28 +27,31 @@ export default class FormSongSelect extends Component {
               search
               selection
               clearable={!this.state.artist}
-              options={this.state.userOptions}
-              onChange={(e, data) => {
+              options={Object.keys(this.props.tree).map((user) => ({
+                key: user,
+                value: user,
+                text: user,
+              }))}
+              value={this.state.who}
+              onChange={(e, { value }) => {
                 this.setState({
-                  who: data.value,
+                  who: value,
                   artist: null,
+                  artistOptions: null,
                   album: null,
+                  albumOptions: null,
                   song: null,
+                  songOptions: null,
                 });
-                if (data.value) {
+                if (value) {
                   this.setState({
-                    artistOptions: Object.keys(this.props.tree[data.value]).map(
+                    artistOptions: Object.keys(this.props.tree[value]).map(
                       (artist) => ({
                         key: artist,
                         value: artist,
                         text: artist,
                       })
                     ),
-                  });
-                } else {
-                  this.setState({
-                    who: null,
-                    artistOptions: [],
                   });
                 }
               }}
@@ -68,26 +66,24 @@ export default class FormSongSelect extends Component {
               selection
               clearable={!this.state.album}
               options={this.state.artistOptions}
-              onChange={(e, data) => {
+              value={this.state.artist}
+              onChange={(e, { value }) => {
                 this.setState({
-                  artist: data.value,
+                  artist: value,
                   album: null,
+                  albumOptions: null,
                   song: null,
+                  songOptions: null,
                 });
-                if (data.value) {
+                if (value) {
                   this.setState({
                     albumOptions: Object.keys(
-                      this.props.tree[this.state.who][data.value]
+                      this.props.tree[this.state.who][value]
                     ).map((album) => ({
                       key: album,
                       value: album,
                       text: album,
                     })),
-                  });
-                } else {
-                  this.setState({
-                    artist: null,
-                    albumOptions: [],
                   });
                 }
               }}
@@ -102,33 +98,28 @@ export default class FormSongSelect extends Component {
               selection
               clearable={!this.state.song}
               options={this.state.albumOptions}
-              onChange={(e, data) => {
+              value={this.state.album}
+              onChange={(e, { value }) => {
                 this.setState({
-                  album: data.value,
+                  album: value,
                   song: null,
+                  songOptions: null,
                 });
-                if (data.value) {
+                if (value) {
                   this.setState({
                     songOptions: Object.keys(
-                      this.props.tree[this.state.who][this.state.artist][
-                        data.value
-                      ]
+                      this.props.tree[this.state.who][this.state.artist][value]
                     ).map((song) => ({
                       key: song,
                       value: song,
                       text: song,
                     })),
                   });
-                } else {
-                  this.setState({
-                    album: null,
-                    songOptions: [],
-                  });
                 }
               }}
             />
           </Form.Field>
-          <Form.Field hidden={this.state.hideSong}>
+          <Form.Field hidden={this.props.hideSong}>
             <Form.Dropdown
               label="Choose Songs"
               placeholder="All Songs"
@@ -137,9 +128,10 @@ export default class FormSongSelect extends Component {
               selection
               clearable
               options={this.state.songOptions}
-              onChange={(e, data) => {
-                data.value
-                  ? this.setState({ song: data.value })
+              value={this.state.song}
+              onChange={(e, { value }) => {
+                value
+                  ? this.setState({ song: value })
                   : this.setState({ song: null });
               }}
             />
@@ -148,7 +140,9 @@ export default class FormSongSelect extends Component {
             primary
             type="submit"
             loading={this.state.loading}
-            disabled={this.state.loading}
+            disabled={
+              this.state.loading || (this.props.hideSong && !this.state.album)
+            }
             onClick={() => {
               this.setState({ loading: true });
               let sel = {

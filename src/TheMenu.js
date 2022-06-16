@@ -1,5 +1,13 @@
 import { Component } from "react";
-import { Button, Divider, Grid, Input, Menu, Segment } from "semantic-ui-react";
+import {
+  Button,
+  Divider,
+  Grid,
+  Input,
+  Menu,
+  Segment,
+  Message,
+} from "semantic-ui-react";
 import FormSongSelect from "./FormSongSelect";
 
 export default class TheMenu extends Component {
@@ -7,7 +15,7 @@ export default class TheMenu extends Component {
 
   handleItemClick = (e, { name }) => {
     this.setState({ activeItem: name });
-    this.props.clearChart(name === "cluster");
+    this.props.clearChart(name === "cluster" || name === "what");
   };
 
   render() {
@@ -45,11 +53,13 @@ export default class TheMenu extends Component {
             name="what"
             active={activeItem === "what"}
             onClick={this.handleItemClick}
-          />
+          >
+            2D Cluster
+          </Menu.Item>
         </Menu>
 
         <Segment relaxed="very">
-          {activeItem === "cluster" ? (
+          {activeItem === "cluster" || activeItem === "what" ? (
             <Grid columns={1}>
               <Grid.Row>
                 <Grid.Column>
@@ -69,9 +79,14 @@ export default class TheMenu extends Component {
                     primary
                     disabled={!this.state.k || this.state.loading}
                     loading={this.state.loading}
-                    onClick={() => {
+                    onClick={async () => {
                       this.setState({ loading: true });
-                      this.props.handleCluster(this.state.k, () => this.setState({ loading: false }));
+                      let error = await this.props.handleCluster(
+                        this.state.k,
+                        activeItem,
+                        () => this.setState({ loading: false })
+                      );
+                      this.setState({ error });
                     }}
                   >
                     Show
@@ -114,6 +129,10 @@ export default class TheMenu extends Component {
               {/* <Divider vertical>vs</Divider> */}
             </>
           )}
+          <Message error hidden={!this.state.error}>
+            <Message.Header>Error</Message.Header>
+            <p>{this.state.error}</p>
+          </Message>
         </Segment>
       </div>
     );
